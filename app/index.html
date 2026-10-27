@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minhas Finanças</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2316a34a'/><text x='16' y='23' font-size='18' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>R$</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topo">
+  <div class="marca"><span class="logo">R$</span> Minhas Finanças</div>
+  <nav class="abas" role="tablist">
+    <button class="aba ativa" data-tela="painel">Painel</button>
+    <button class="aba" data-tela="lancamentos">Lançamentos</button>
+    <button class="aba" data-tela="orcamento">Orçamento</button>
+    <button class="aba" data-tela="metas">Metas</button>
+    <button class="aba" data-tela="config">Ajustes</button>
+  </nav>
+  <div class="mes-seletor">
+    <button class="icone" id="mesAnterior" aria-label="Mês anterior">‹</button>
+    <span id="mesAtual"></span>
+    <button class="icone" id="mesProximo" aria-label="Próximo mês">›</button>
+  </div>
+</header>
+
+<main>
+  <!-- PAINEL -->
+  <section id="tela-painel" class="tela ativa">
+    <div class="cartoes">
+      <div class="cartao"><span class="rotulo">Receitas do mês</span><strong id="kpiReceitas" class="pos">R$ 0,00</strong></div>
+      <div class="cartao"><span class="rotulo">Despesas do mês</span><strong id="kpiDespesas" class="neg">R$ 0,00</strong></div>
+      <div class="cartao"><span class="rotulo">Resultado do mês</span><strong id="kpiResultado">R$ 0,00</strong></div>
+      <div class="cartao"><span class="rotulo">Saldo total das contas</span><strong id="kpiSaldo">R$ 0,00</strong></div>
+    </div>
+    <div class="grade2">
+      <div class="bloco"><h2>Despesas por categoria</h2><div class="grafico"><canvas id="grafCategorias"></canvas></div><p id="semDespesas" class="vazio oculto">Sem despesas neste mês.</p></div>
+      <div class="bloco"><h2>Últimos 6 meses</h2><div class="grafico"><canvas id="grafMeses"></canvas></div></div>
+    </div>
+    <div class="grade2">
+      <div class="bloco"><h2>Contas</h2><ul id="listaContas" class="lista-simples"></ul></div>
+      <div class="bloco"><h2>Orçamento do mês</h2><div id="resumoOrcamento"></div></div>
+    </div>
+    <div class="bloco"><h2>Últimos lançamentos</h2><div id="ultimos"></div></div>
+  </section>
+
+  <!-- LANÇAMENTOS -->
+  <section id="tela-lancamentos" class="tela">
+    <div class="barra">
+      <button class="btn primario" id="novaDespesa">+ Despesa</button>
+      <button class="btn sucesso" id="novaReceita">+ Receita</button>
+      <button class="btn" id="novaTransferencia">⇄ Transferência</button>
+      <input type="search" id="busca" placeholder="Buscar descrição…">
+      <select id="filtroTipo"><option value="">Todos os tipos</option><option value="despesa">Despesas</option><option value="receita">Receitas</option><option value="transferencia">Transferências</option></select>
+      <select id="filtroCategoria"><option value="">Todas as categorias</option></select>
+      <select id="filtroConta"><option value="">Todas as contas</option></select>
+    </div>
+    <div class="bloco"><div id="tabelaLancamentos"></div><p id="totalFiltro" class="rodape-tabela"></p></div>
+  </section>
+
+  <!-- ORÇAMENTO -->
+  <section id="tela-orcamento" class="tela">
+    <div class="bloco">
+      <h2>Limite mensal por categoria</h2>
+      <p class="dica">Defina quanto quer gastar por mês em cada categoria. Deixe vazio para não ter limite.</p>
+      <div id="tabelaOrcamento"></div>
+    </div>
+  </section>
+
+  <!-- METAS -->
+  <section id="tela-metas" class="tela">
+    <div class="barra"><button class="btn primario" id="novaMeta">+ Nova meta</button></div>
+    <div id="listaMetas" class="metas"></div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="tela-config" class="tela">
+    <div class="grade2">
+      <div class="bloco">
+        <h2>Contas</h2>
+        <p class="dica">Carteira, conta do banco, cartão… O saldo inicial é quanto tinha quando começou a usar o app.</p>
+        <div id="cfgContas"></div>
+        <button class="btn" id="addConta">+ Adicionar conta</button>
+      </div>
+      <div class="bloco">
+        <h2>Categorias</h2>
+        <div id="cfgCategorias"></div>
+        <button class="btn" id="addCategoria">+ Adicionar categoria</button>
+      </div>
+    </div>
+    <div class="grade2">
+      <div class="bloco">
+        <h2>Cópia de segurança</h2>
+        <p class="dica" id="infoArmazenamento"></p>
+        <div class="botoes">
+          <button class="btn" id="exportarJson">Baixar backup (.json)</button>
+          <label class="btn">Restaurar backup<input type="file" id="importarJson" accept=".json,application/json" hidden></label>
+        </div>
+      </div>
+      <div class="bloco">
+        <h2>Planilha (CSV)</h2>
+        <p class="dica">Exporte para abrir no Excel/Google Planilhas, ou importe um extrato com as colunas: <code>data;descricao;valor;categoria;conta</code>. Valor negativo = despesa.</p>
+        <div class="botoes">
+          <button class="btn" id="exportarCsv">Exportar CSV</button>
+          <label class="btn">Importar CSV<input type="file" id="importarCsv" accept=".csv,text/csv" hidden></label>
+        </div>
+      </div>
+    </div>
+    <div class="bloco">
+      <h2>Aparência e dados</h2>
+      <div class="botoes">
+        <select id="tema"><option value="auto">Tema automático</option><option value="claro">Tema claro</option><option value="escuro">Tema escuro</option></select>
+        <button class="btn" id="dadosExemplo">Carregar dados de exemplo</button>
+        <button class="btn perigo" id="apagarTudo">Apagar tudo</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="status" class="status" aria-live="polite"></div>
+
+<!-- MODAL -->
+<dialog id="modal">
+  <form method="dialog" id="formModal">
+    <h2 id="tituloModal"></h2>
+    <div id="corpoModal"></div>
+    <div class="acoes">
+      <button type="button" class="btn perigo oculto" id="btnExcluir">Excluir</button>
+      <span class="espaco"></span>
+      <button type="button" class="btn" id="btnCancelar">Cancelar</button>
+      <button type="submit" class="btn primario" id="btnSalvar">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
