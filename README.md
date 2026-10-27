@@ -16,26 +16,21 @@ Aplicativo para organizar suas finanças pessoais, que roda **no seu computador*
 
 ## Como abrir
 
-Você precisa do **Python 3** (é grátis): <https://www.python.org/downloads/>. No Windows, durante a instalação, marque a opção **"Add python.exe to PATH"**. Não precisa instalar mais nada.
+Não precisa instalar nada.
 
 1. Baixe esta pasta (no GitHub: botão verde **Code → Download ZIP**) e descompacte.
-2. Abra o app:
-   - **Windows:** dois cliques em `Abrir no Windows.bat`.
-   - **Mac / Linux:** no Terminal, dentro da pasta, rode `./abrir-mac-linux.sh` (ou `python3 financas.py`).
-3. O navegador abre sozinho em <http://127.0.0.1:8765>. Deixe a janela preta aberta enquanto usa o app. Para fechar, feche essa janela (ou aperte `Ctrl+C`).
+2. Dê dois cliques no arquivo **`index.html`**. Ele abre no navegador (Chrome, Edge, Firefox…) e funciona sem internet.
+
+Dica: crie um atalho do `index.html` na área de trabalho ou salve nos favoritos do navegador.
 
 Para conhecer o app antes de pôr os seus dados, vá em **Ajustes → Carregar dados de exemplo**. Depois, use **Apagar tudo** para começar do zero.
 
-### Sem Python?
-
-Dá para abrir o arquivo `app/index.html` direto no navegador. Funciona tudo, mas os dados ficam guardados só naquele navegador (se limpar os dados de navegação, perde). Nesse modo, baixe backups com frequência. Quando abrir pelo Python pela primeira vez, ele traz esses dados para o arquivo do computador (se for o mesmo navegador).
-
 ## Onde ficam os dados
 
-- `dados/financas.json`: todos os seus dados.
-- `dados/backups/`: uma cópia automática por dia (guarda os últimos 30 dias).
+Os dados ficam guardados **no navegador do seu computador** (nada vai para a internet). Por isso:
 
-Para levar para outro computador, copie a pasta `dados/` junto, ou use **Ajustes → Baixar backup** e depois **Restaurar backup** no outro computador.
+- Use sempre o **mesmo navegador** para abrir o app.
+- Se limpar os dados de navegação ou trocar de navegador/computador, eles não vão junto. Para não perder nada, baixe um **backup** em **Ajustes → Baixar backup** de vez em quando (o app lembra você a cada 15 dias). Para recuperar, use **Restaurar backup**.
 
 ## Importar extrato (CSV)
 
@@ -51,7 +46,6 @@ Valor negativo vira despesa e valor positivo vira receita. Categorias e contas q
 
 ## Detalhes técnicos
 
-- `financas.py`: servidor local feito só com a biblioteca padrão do Python. Escuta apenas em `127.0.0.1` (outros computadores da rede não acessam). Opções: `--porta 8800` e `--sem-navegador`.
-- `app/`: a interface (HTML, CSS e JavaScript puro, sem etapa de build).
-- `app/vendor/chart.umd.min.js`: [Chart.js](https://www.chartjs.org/) 4.4.7 (licença MIT, em `app/vendor/LICENSE-chartjs.md`), já incluído para funcionar sem internet.
+- `index.html`, `style.css`, `app.js`: a interface toda, em HTML, CSS e JavaScript puro (sem instalação e sem etapa de build).
+- `vendor/chart.umd.min.js`: [Chart.js](https://www.chartjs.org/) 4.4.7 (licença MIT, em `vendor/LICENSE-chartjs.md`), já incluído para funcionar sem internet.
 - Valores guardados em centavos (números inteiros), para não ter erro de arredondamento.

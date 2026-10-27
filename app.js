@@ -1,7 +1,7 @@
 /* Minhas Finanças - front-end (vanilla JS, no build step).
  * Money is stored as integer cents to avoid floating point errors.
- * Storage: the local Python server (dados/financas.json) when available,
- * otherwise the browser's localStorage.
+ * Runs straight from the file (double-click index.html), no server needed.
+ * Data lives in the browser's localStorage; JSON backups protect it.
  */
 'use strict';
 
@@ -68,26 +68,11 @@ function dadosIniciais() {
 
 const estado = {
   dados: null,
-  modo: 'navegador', // 'servidor' | 'navegador'
   mes: hoje().slice(0, 7),
 };
 
-async function carregar() {
-  try {
-    const r = await fetch('api/dados', { cache: 'no-store' });
-    if (r.ok) {
-      const j = await r.json();
-      estado.modo = 'servidor';
-      estado.dados = j.dados;
-      // First run with the server: bring over anything saved in the browser before.
-      if (!estado.dados) {
-        const local = lerLocal();
-        estado.dados = local || dadosIniciais();
-        await salvarAgora();
-      }
-    }
-  } catch { /* opened as a file or server is off: use the browser */ }
-  if (estado.modo === 'navegador') estado.dados = lerLocal() || dadosIniciais();
+function carregar() {
+  estado.dados = lerLocal() || dadosIniciais();
   normalizar(estado.dados);
 }
 function lerLocal() {
@@ -102,18 +87,8 @@ function salvar() {
   clearTimeout(timerSalvar);
   timerSalvar = setTimeout(salvarAgora, 300);
 }
-async function salvarAgora() {
-  const json = JSON.stringify(estado.dados);
-  if (estado.modo === 'servidor') {
-    try {
-      const r = await fetch('api/dados', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: json });
-      if (!r.ok) throw new Error((await r.json()).erro || r.status);
-      return;
-    } catch (e) {
-      aviso('⚠ Não consegui salvar no computador (o servidor foi fechado?). Guardei no navegador por enquanto.');
-    }
-  }
-  try { localStorage.setItem(LS_KEY, json); } catch { aviso('⚠ Não consegui salvar os dados!'); }
+function salvarAgora() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(estado.dados)); } catch { aviso('⚠ Não consegui salvar os dados!'); }
 }
 
 let timerAviso = null;
@@ -341,9 +316,9 @@ function renderMetas() {
 
 function renderConfig() {
   $('#tema').value = estado.dados.config.tema || 'auto';
-  $('#infoArmazenamento').innerHTML = estado.modo === 'servidor'
-    ? 'Seus dados estão salvos no computador, no arquivo <code>dados/financas.json</code> (com uma cópia por dia em <code>dados/backups/</code>). Baixe um backup de vez em quando para guardar em outro lugar.'
-    : '<strong>Atenção:</strong> o app foi aberto direto no navegador, então os dados ficam só neste navegador. Para salvar num arquivo no computador, abra pelo <code>Abrir no Windows.bat</code> ou <code>abrir-mac-linux.sh</code>. Baixe backups com frequência.';
+  const ult = estado.dados.config.ultimoBackup;
+  $('#infoArmazenamento').innerHTML = 'Seus dados ficam guardados neste navegador, no seu computador. Se limpar os dados de navegação ou trocar de navegador, eles somem: baixe um backup de vez em quando e guarde numa pasta segura.' +
+    `<br><strong>Último backup:</strong> ${ult ? fmtData(ult) : 'nunca'}`;
 
   $('#cfgContas').innerHTML = estado.dados.contas.map((c) => `<div class="cfg-linha" data-conta="${c.id}">
       <input type="color" value="${esc(c.cor)}" data-campo="cor" title="Cor">
@@ -699,7 +674,11 @@ function ligarEventos() {
   };
 
   // Backup / CSV
-  $('#exportarJson').onclick = () => baixar(`financas-backup-${hoje()}.json`, JSON.stringify(estado.dados, null, 1), 'application/json');
+  $('#exportarJson').onclick = () => {
+    estado.dados.config.ultimoBackup = hoje();
+    baixar(`financas-backup-${hoje()}.json`, JSON.stringify(estado.dados, null, 1), 'application/json');
+    salvar(); render(); $('#lembreteBackup')?.remove();
+  };
   $('#importarJson').onchange = async (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     try {
@@ -742,15 +721,19 @@ function irPara(tela) {
   if (tela === 'painel') renderPainel(); // charts need a visible canvas to size correctly
 }
 
-(async function iniciar() {
-  await carregar();
+(function iniciar() {
+  carregar();
   aplicarTema();
   ligarEventos();
   render();
-  if (estado.modo === 'navegador') {
+  // Gentle reminder: data only lives in this browser.
+  const ult = estado.dados.config.ultimoBackup;
+  const dias = ult ? (new Date(hoje()) - new Date(ult)) / 864e5 : Infinity;
+  if (estado.dados.lancamentos.length >= 10 && dias > 15) {
     const div = document.createElement('div');
-    div.className = 'aviso';
-    div.innerHTML = 'Modo navegador: os dados ficam salvos só neste navegador. Para salvar num arquivo no computador, abra pelo <code>Abrir no Windows.bat</code> ou <code>abrir-mac-linux.sh</code>.';
+    div.className = 'aviso'; div.id = 'lembreteBackup';
+    div.innerHTML = `${ult ? `Seu último backup foi em ${fmtData(ult)}.` : 'Você ainda não fez nenhum backup.'} <button class="link" id="backupAgora">Baixar backup agora</button>`;
     $('main').prepend(div);
+    $('#backupAgora').onclick = () => $('#exportarJson').click();
   }
 })();
