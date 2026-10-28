@@ -14,7 +14,19 @@ Aplicativo para organizar suas finanças pessoais, que roda **no seu computador*
 - **Backup e planilha:** baixar/restaurar backup (.json), exportar CSV para Excel ou Google Planilhas e importar extrato em CSV.
 - Atalhos de teclado: `d` = nova despesa, `r` = nova receita, `←` `→` = trocar de mês.
 
-## Como abrir
+## Instalar no celular (Android ou iPhone)
+
+Abra no celular o endereço **https://antoniofeli3478-rgb.github.io/minha-financa/** e:
+
+- **Android (Chrome):** toque em **Instalar app** (ou menu ⋮ → **Adicionar à tela inicial** → **Instalar**).
+- **iPhone (Safari):** toque no botão **Compartilhar** (quadrado com seta) → **Adicionar à Tela de Início** → **Adicionar**.
+
+Pronto: o ícone aparece na tela inicial, o app abre em tela cheia e funciona **sem internet**. Os dados ficam só no celular.
+No celular, use o botão verde **+** para lançar despesa, receita ou transferência.
+
+> Para o endereço funcionar, o GitHub Pages precisa estar ligado: no repositório, **Settings → Pages → Branch: main, pasta / (root) → Save** (só uma vez).
+
+## Como abrir no computador
 
 Não precisa instalar nada.
 
@@ -47,5 +59,6 @@ Valor negativo vira despesa e valor positivo vira receita. Categorias e contas q
 ## Detalhes técnicos
 
 - `index.html`, `style.css`, `app.js`: a interface toda, em HTML, CSS e JavaScript puro (sem instalação e sem etapa de build).
+- `manifest.webmanifest`, `sw.js` e `icons/`: o que transforma o site em app instalável (PWA) que funciona offline. Ao mudar qualquer arquivo, aumente o `VERSION` no `sw.js` para os celulares receberem a atualização.
 - `vendor/chart.umd.min.js`: [Chart.js](https://www.chartjs.org/) 4.4.7 (licença MIT, em `vendor/LICENSE-chartjs.md`), já incluído para funcionar sem internet.
 - Valores guardados em centavos (números inteiros), para não ter erro de arredondamento.

@@ -2,20 +2,27 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16a34a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Finanças">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Minhas Finanças</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2316a34a'/><text x='16' y='23' font-size='18' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>R$</text></svg>">
+<link rel="icon" type="image/png" href="icons/favicon.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topo">
   <div class="marca"><span class="logo">R$</span> Minhas Finanças</div>
   <nav class="abas" role="tablist">
-    <button class="aba ativa" data-tela="painel">Painel</button>
-    <button class="aba" data-tela="lancamentos">Lançamentos</button>
-    <button class="aba" data-tela="orcamento">Orçamento</button>
-    <button class="aba" data-tela="metas">Metas</button>
-    <button class="aba" data-tela="config">Ajustes</button>
+    <button class="aba ativa" data-tela="painel"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg><span>Painel</span></button>
+    <button class="aba" data-tela="lancamentos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg><span>Lançamentos</span></button>
+    <button class="aba" data-tela="orcamento"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v9h9c-.47-4.74-4.26-8.53-9-9zm0 11v9c4.74-.47 8.53-4.26 9-9z"/></svg><span>Orçamento</span></button>
+    <button class="aba" data-tela="metas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-14a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm0 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><span>Metas</span></button>
+    <button class="aba" data-tela="config"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1c.5.4 1.1.7 1.7 1L11 21h4l.4-2.9c.6-.3 1.2-.6 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg><span>Ajustes</span></button>
   </nav>
   <div class="mes-seletor">
     <button class="icone" id="mesAnterior" aria-label="Mês anterior">‹</button>
@@ -118,6 +125,14 @@
 </main>
 
 <div id="status" class="status" aria-live="polite"></div>
+
+<!-- Mobile: floating "+" button -->
+<div class="fab-menu" id="fabMenu">
+  <button class="btn primario" data-novo="despesa">− Despesa</button>
+  <button class="btn sucesso" data-novo="receita">+ Receita</button>
+  <button class="btn" data-novo="transferencia">⇄ Transferência</button>
+</div>
+<button class="fab" id="fab" aria-label="Novo lançamento" aria-expanded="false">+</button>
 
 <!-- MODAL -->
 <dialog id="modal">

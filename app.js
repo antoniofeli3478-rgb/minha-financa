@@ -162,7 +162,7 @@ function linhaLancamento(l, compacta = false) {
 }
 function tabela(lista, compacta) {
   if (!lista.length) return '<p class="vazio">Nenhum lançamento.</p>';
-  return `<div class="rolagem"><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th>${compacta ? '' : '<th class="esconder-celular">Conta</th>'}<th class="valor">Valor</th></tr></thead>
+  return `<div class="rolagem"><table class="tab-lanc"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th>${compacta ? '' : '<th class="esconder-celular">Conta</th>'}<th class="valor">Valor</th></tr></thead>
     <tbody>${lista.map((l) => linhaLancamento(l, compacta)).join('')}</tbody></table></div>`;
 }
 
@@ -317,7 +317,7 @@ function renderMetas() {
 function renderConfig() {
   $('#tema').value = estado.dados.config.tema || 'auto';
   const ult = estado.dados.config.ultimoBackup;
-  $('#infoArmazenamento').innerHTML = 'Seus dados ficam guardados neste navegador, no seu computador. Se limpar os dados de navegação ou trocar de navegador, eles somem: baixe um backup de vez em quando e guarde numa pasta segura.' +
+  $('#infoArmazenamento').innerHTML = 'Seus dados ficam guardados só neste aparelho (no app instalado ou no navegador). Se desinstalar o app, limpar os dados do navegador ou trocar de celular, eles não vão junto: baixe um backup de vez em quando e guarde num lugar seguro (Drive, WhatsApp, e-mail).' +
     `<br><strong>Último backup:</strong> ${ult ? fmtData(ult) : 'nunca'}`;
 
   $('#cfgContas').innerHTML = estado.dados.contas.map((c) => `<div class="cfg-linha" data-conta="${c.id}">
@@ -552,7 +552,11 @@ function importarCsv(texto) {
   aviso(`${ok} lançamento(s) importado(s)${erro ? `, ${erro} linha(s) ignorada(s)` : ''}.`);
 }
 
-function baixar(nome, conteudo, tipo) {
+async function baixar(nome, conteudo, tipo) {
+  const arquivo = new File([conteudo], nome, { type: tipo });
+  if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({ files: [arquivo] })) {
+    try { await navigator.share({ files: [arquivo], title: nome }); return; } catch (e) { if (e.name === 'AbortError') return; }
+  }
   const url = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
   const a = Object.assign(document.createElement('a'), { href: url, download: nome });
   document.body.appendChild(a); a.click(); a.remove();
@@ -606,6 +610,18 @@ function ligarEventos() {
   $('#mesAnterior').onclick = () => { estado.mes = somaMeses(estado.mes, -1); render(); };
   $('#mesProximo').onclick = () => { estado.mes = somaMeses(estado.mes, 1); render(); };
 
+  const fab = $('#fab'), fabMenu = $('#fabMenu');
+  const fecharFab = () => { fabMenu.classList.remove('aberto'); fab.setAttribute('aria-expanded', 'false'); };
+  fab.onclick = () => {
+    const abrir = !fabMenu.classList.contains('aberto');
+    fabMenu.classList.toggle('aberto', abrir); fab.setAttribute('aria-expanded', String(abrir));
+  };
+  fabMenu.addEventListener('click', (e) => {
+    const tipo = e.target.closest('[data-novo]')?.dataset.novo; if (!tipo) return;
+    fecharFab();
+    if (tipo === 'transferencia') $('#novaTransferencia').click(); else formLancamento(tipo);
+  });
+  document.addEventListener('click', (e) => { if (!e.target.closest('#fab, #fabMenu')) fecharFab(); });
   $('#novaDespesa').onclick = () => formLancamento('despesa');
   $('#novaReceita').onclick = () => formLancamento('receita');
   $('#novaTransferencia').onclick = () => {
@@ -722,6 +738,11 @@ function irPara(tela) {
 }
 
 (function iniciar() {
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  // Ask the browser not to evict our data when the phone runs low on space.
+  navigator.storage?.persist?.().catch(() => {});
   carregar();
   aplicarTema();
   ligarEventos();
