@@ -24,16 +24,16 @@ Abra no celular o endereço **https://antoniofeli3478-rgb.github.io/minha-financ
 Pronto: o ícone aparece na tela inicial, o app abre em tela cheia e funciona **sem internet**. Os dados ficam só no celular.
 No celular, use o botão verde **+** para lançar despesa, receita ou transferência.
 
-> Para o endereço funcionar, o GitHub Pages precisa estar ligado: no repositório, **Settings → Pages → Branch: main, pasta / (root) → Save** (só uma vez).
+> O endereço funciona porque o GitHub Pages está ligado em **Settings → Pages → Branch: main, pasta /docs**.
 
 ## Como abrir no computador
 
 Não precisa instalar nada.
 
 1. Baixe esta pasta (no GitHub: botão verde **Code → Download ZIP**) e descompacte.
-2. Dê dois cliques no arquivo **`index.html`**. Ele abre no navegador (Chrome, Edge, Firefox…) e funciona sem internet.
+2. Abra a pasta **`docs`** e dê dois cliques no arquivo **`index.html`**. Ele abre no navegador (Chrome, Edge, Firefox…) e funciona sem internet.
 
-Dica: crie um atalho do `index.html` na área de trabalho ou salve nos favoritos do navegador.
+Dica: crie um atalho do `docs/index.html` na área de trabalho ou salve nos favoritos do navegador.
 
 Para conhecer o app antes de pôr os seus dados, vá em **Ajustes → Carregar dados de exemplo**. Depois, use **Apagar tudo** para começar do zero.
 
@@ -58,6 +58,7 @@ Valor negativo vira despesa e valor positivo vira receita. Categorias e contas q
 
 ## Detalhes técnicos
 
+- Todo o app fica na pasta `docs/` (é a pasta que o GitHub Pages publica).
 - `index.html`, `style.css`, `app.js`: a interface toda, em HTML, CSS e JavaScript puro (sem instalação e sem etapa de build).
 - `manifest.webmanifest`, `sw.js` e `icons/`: o que transforma o site em app instalável (PWA) que funciona offline. Ao mudar qualquer arquivo, aumente o `VERSION` no `sw.js` para os celulares receberem a atualização.
 - `vendor/chart.umd.min.js`: [Chart.js](https://www.chartjs.org/) 4.4.7 (licença MIT, em `vendor/LICENSE-chartjs.md`), já incluído para funcionar sem internet.
